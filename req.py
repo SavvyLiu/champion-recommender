@@ -36,6 +36,7 @@ def getPlayerMastery(puuid: str) -> List[tuple[int, int]]:
 
 def main():
     puuid = getPlayerPUUID('SavageCabb')
+    print(puuid)
     print(getPlayerMastery(puuid))
 
 if __name__ == '__main__':

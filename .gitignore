@@ -4,3 +4,4 @@ Scripts
 pyvenv.cfg
 .env
 data.db
+__pycache__
