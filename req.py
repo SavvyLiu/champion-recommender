@@ -4,6 +4,7 @@ import requests
 from dotenv import dotenv_values
 
 API_KEY = dotenv_values()['API_KEY']
+COUNT = 5 # the amount of champions to gather from each account
 
 def getPlayerPUUID(summoner_name: str) -> str:
     req = requests.get(f'https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{summoner_name}?api_key={API_KEY}')
@@ -27,7 +28,7 @@ def getPlayers(seed_puuid: str) -> List[str]:
     return json.loads(req.text)['metadata']['participants'] 
 
 def getPlayerMastery(puuid: str) -> List[tuple[int, int]]:
-    req = requests.get(f'https://na1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid}/top?api_key={API_KEY}')
+    req = requests.get(f'https://na1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid}/top?={COUNT}&?api_key={API_KEY}')
     if req.status_code != 200:
         print(f'[Error] issue getting player infomation {req.status_code}')
         return

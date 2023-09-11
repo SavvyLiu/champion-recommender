@@ -12,7 +12,7 @@ def setup():
     cur = con.cursor()
     cur.execute('CREATE TABLE player_queue(puuid)') # queue
     cur.execute('CREATE TABLE mastery_data(puuid, championid, masterypoints)') # champion
-    cur.execute('CREATE TABLE visited_players(puuid)') # visited players
+    cur.execute('CREATE TABLE visited_accounts(puuid)') # visited players
     cur.close()
     con.close()
     return
@@ -35,23 +35,28 @@ def main():
 
     count = cur.execute('SELECT COUNT(*) FROM mastery_data').fetchone()[0]
     while count < 10000:
-        time.sleep(1/10)
         try:
-            puuid = cur.execute('SELECT * FROM player_queue').fetchone()[0]
+            time.sleep(2.5)
             queue_length = cur.execute('SELECT COUNT(*) FROM player_queue').fetchone()[0]
+            puuid = cur.execute('SELECT * FROM player_queue').fetchone()[0]
             if queue_length < QUEUE_BUFFER:
-                players = req.getPlayers(puuid)
-                for player in players:
-                    is_present = cur.execute('SELECT * FROM visited_players WHERE puuid=?', (player,)).fetchone()
+                accounts = req.getPlayers(puuid)
+                for account in accounts:
+                    is_present = cur.execute('SELECT * FROM visited_accounts WHERE puuid=?', (account,)).fetchone()
                     if not is_present:
-                        cur.execute('INSERT INTO player_queue VALUES(?)', (puuid,))
-            player_mastery = req.getPlayerMastery(puuid)
-            print(player_mastery)
-            cur.execute('INSERT INTO mastery_data VALUES(?, ?, ?)', (puuid, *player_mastery,))
-            cur.execute('INSERT INTO visited_accounts VALUES(?)', (puuid,))
+                        cur.execute('INSERT INTO player_queue VALUES(?)', (account,))
 
+            player_mastery = req.getPlayerMastery(puuid)
+            for mastery in player_mastery:
+                print(f'Writting mastery data ({count + 1}/10000)')
+                cur.execute('INSERT INTO mastery_data VALUES(?, ?, ?)', (puuid, *mastery,))
+
+            cur.execute('INSERT INTO visited_accounts VALUES(?)', (puuid,))
+            cur.execute('DELETE FROM player_queue WHERE puuid=?', (puuid,))
             count = cur.execute('SELECT COUNT(*) FROM mastery_data').fetchone()[0]
+            con.commit()
         except KeyboardInterrupt:
+            print('Exiting program')
             con.commit()
             cur.close()
             con.close()    
