@@ -6,8 +6,8 @@ from dotenv import dotenv_values
 API_KEY = dotenv_values()['API_KEY']
 COUNT = 5 # the amount of champions to gather from each account
 
-def getPlayerPUUID(summoner_name: str) -> str:
-    req = requests.get(f'https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{summoner_name}?api_key={API_KEY}')
+def getPlayerPUUID(summoner_name: str, tagline: str) -> str:
+    req = requests.get(f'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{summoner_name}/{tagline}?api_key={API_KEY}')
     if req.status_code != 200:
         print(f'[Error] issue getting player puuid {req.status_code}')
         return
@@ -36,7 +36,7 @@ def getPlayerMastery(puuid: str) -> List[tuple[int, int]]:
     return [(champ['championId'], champ['championPoints']) for champ in body]
 
 def main():
-    puuid = getPlayerPUUID('SavageCabb')
+    puuid = getPlayerPUUID('SavageCabb', 'NA1')
     print(puuid)
     print(getPlayerMastery(puuid))
 
