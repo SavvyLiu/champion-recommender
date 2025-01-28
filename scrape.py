@@ -34,7 +34,7 @@ def main():
         con.commit()
 
     count = cur.execute('SELECT COUNT(*) FROM mastery_data').fetchone()[0]
-    while count < 10000:
+    while count < 20000:
         try:
             time.sleep(2.5)
             queue_length = cur.execute('SELECT COUNT(*) FROM player_queue').fetchone()[0]
@@ -48,7 +48,7 @@ def main():
 
             player_mastery = req.getPlayerMastery(puuid)
             for mastery in player_mastery:
-                print(f'Writting mastery data ({count + 1}/10000)')
+                print(f'Writting mastery data ({count + 1}/20000)')
                 cur.execute('INSERT INTO mastery_data VALUES(?, ?, ?)', (puuid, *mastery,))
 
             cur.execute('INSERT INTO visited_accounts VALUES(?)', (puuid,))
